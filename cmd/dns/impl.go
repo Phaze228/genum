@@ -268,10 +268,12 @@ func (a *AXFR) recurseTransfer(wg *sync.WaitGroup) {
 		ns := dns.Fqdn(task.Nameserver)
 		// fmt.Printf("Starting %s @ %s\n ", dom, ns)
 		DN := dom + "@" + ns
+		a.mu.Lock()
 		if _, visit := a.visited.Load(DN); visit {
 			atomic.AddInt32(a.Counter, -1)
 			continue
 		}
+		a.mu.Unlock()
 		a.visited.Store(DN, true)
 		a.transfers[DN] = NewRecords()
 		t := new(dns.Transfer)
